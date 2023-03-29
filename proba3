@@ -1,0 +1,348 @@
+import sys
+import csv
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QFileDialog
+from PyQt5 import QtWidgets
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        # Players section
+        players_label = QLabel('Játékosok')
+        name_label = QLabel('Név')
+        age_label = QLabel('Kor')
+        gender_label = QLabel('Nem')
+        position_label = QLabel('Pozíció')
+        team_label = QLabel('Csapat')
+        team_performance_label = QLabel('Teljesítmény')
+        injury_label = QLabel('Sérülési történet')
+        goals_label = QLabel('Gólok')
+        assists_label = QLabel('Gólpasszok')
+        rebounds_label = QLabel('Lepattanók')
+        self.name_edit = QLineEdit()
+        self.age_edit = QLineEdit()
+        self.gender_combo = QComboBox()
+        self.gender_combo.addItems(['Férfi', 'Nő'])
+        self.position_edit = QLineEdit()
+        self.team_edit = QLineEdit()
+        self.team_performance_edit = QLineEdit()
+        self.injury_edit = QLineEdit()
+        self.goals_edit = QLineEdit()
+        self.assists_edit = QLineEdit()
+        self.rebounds_edit = QLineEdit()
+        add_player_button = QPushButton('Hozzáadás')
+        add_player_button.clicked.connect(self.add_player)
+        players_layout = QVBoxLayout()
+        players_layout.addWidget(players_label)
+        players_layout.addWidget(name_label)
+        players_layout.addWidget(self.name_edit)
+        players_layout.addWidget(age_label)
+        players_layout.addWidget(self.age_edit)
+        players_layout.addWidget(gender_label)
+        players_layout.addWidget(self.gender_combo)
+        players_layout.addWidget(position_label)
+        players_layout.addWidget(self.position_edit)
+        players_layout.addWidget(team_label)
+        players_layout.addWidget(self.team_edit)
+        players_layout.addWidget(team_performance_label)
+        players_layout.addWidget(self.team_performance_edit)
+        players_layout.addWidget(injury_label)
+        players_layout.addWidget(self.injury_edit)
+        players_layout.addWidget(goals_label)
+        players_layout.addWidget(self.goals_edit)
+        players_layout.addWidget(assists_label)
+        players_layout.addWidget(self.assists_edit)
+        players_layout.addWidget(rebounds_label)
+        players_layout.addWidget(self.rebounds_edit)
+        players_layout.addWidget(add_player_button)
+        
+        # Teams section
+        teams_label = QLabel('Csapatok')
+        team_name_label = QLabel('Név')
+        coach_name_label = QLabel('Edző neve')
+        stadium_name_label = QLabel('Stadion neve')
+        founded_year_label = QLabel('Alapítás éve')
+        player_roster_label = QLabel('Játékoskeret')
+        team_performance_label = QLabel('Teljesítmény')
+        points_label = QLabel('Pontok')
+        goals_scored_label = QLabel('Lőtt gólok')
+        goals_conceded_label = QLabel('Kapott gólok')
+        self.team_name_edit = QLineEdit()
+        self.coach_name_edit = QLineEdit()
+        self.stadium_name_edit = QLineEdit()
+        self.founded_year_edit = QLineEdit()
+        self.player_roster_edit = QLineEdit()
+        self.team_performance_edit_2 = QLineEdit()
+        self.points_edit = QLineEdit()
+        self.goals_scored_edit = QLineEdit()
+        self.goals_conceded_edit = QLineEdit()
+        add_team_button = QPushButton('Hozzáadás')
+        add_team_button.clicked.connect(self.add_team)
+        teams_layout = QVBoxLayout()
+        teams_layout.addWidget(teams_label)
+        teams_layout.addWidget(team_name_label)
+        teams_layout.addWidget(self.team_name_edit)
+        teams_layout.addWidget(coach_name_label)
+        teams_layout.addWidget(self.coach_name_edit)
+        teams_layout.addWidget(stadium_name_label)
+        teams_layout.addWidget(self.stadium_name_edit)
+        teams_layout.addWidget(founded_year_label)
+        teams_layout.addWidget(self.founded_year_edit)
+        teams_layout.addWidget(player_roster_label)
+        teams_layout.addWidget(self.player_roster_edit)
+        teams_layout.addWidget(team_performance_label)
+        teams_layout.addWidget(self.team_performance_edit_2)
+        teams_layout.addWidget(points_label)
+        teams_layout.addWidget(self.points_edit)
+        teams_layout.addWidget(goals_scored_label)
+        teams_layout.addWidget(self.goals_scored_edit)
+        teams_layout.addWidget(goals_conceded_label)
+        teams_layout.addWidget(self.goals_conceded_edit)
+        teams_layout.addWidget(add_team_button)
+        # Table section
+        table_label = QLabel('Csapatok és játékosok')
+        self.table = QTableWidget()
+        self.table.setColumnCount(12)
+        self.table.setHorizontalHeaderLabels(['Név', 'Kor', 'Nem', 'Pozíció', 'Csapat', 'Csapat teljesítmény', 'Sérülési történet', 'Gólok', 'Gólpasszok', 'Lepattanók', 'Pontok', 'Stadion'])
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QTableWidget.SingleSelection)
+        table_layout = QVBoxLayout()
+        table_layout.addWidget(table_label)
+        table_layout.addWidget(self.table)
+        # File section
+        file_label = QLabel('Fájlkezelés')
+        load_button = QPushButton('Betöltés')
+        load_button.clicked.connect(self.load_data)
+        save_button = QPushButton('Mentés')
+        save_button.clicked.connect(self.save_data)
+        file_layout = QHBoxLayout()
+        file_layout.addWidget(file_label)
+        file_layout.addWidget(load_button)
+        file_layout.addWidget(save_button)
+        # Main layout
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(players_layout)
+        main_layout.addLayout(teams_layout)
+        main_layout.addLayout(table_layout)
+        main_layout.addLayout(file_layout)
+        self.setLayout(main_layout)
+        self.setLayout(main_layout)
+        self.setGeometry(200, 200, 1000, 500)
+        self.setWindowTitle('Sports Management System')
+        self.show()
+    def add_player(self):
+        name = self.name_edit.text()
+        age = self.age_edit.text()
+        gender = self.gender_combo.currentText()
+        position = self.position_edit.text()
+        team = self.team_edit.text()
+        team_performance = self.team_performance_edit.text()
+        injury = self.injury_edit.text()
+        goals = self.goals_edit.text()
+        assists = self.assists_edit.text()
+        rebounds = self.rebounds_edit.text()
+        row_count = self.table.rowCount()
+        self.table.insertRow(row_count)
+        self.table.setItem(row_count, 0, QTableWidgetItem(name))
+        self.table.setItem(row_count, 1, QTableWidgetItem(age))
+        self.table.setItem(row_count, 2, QTableWidgetItem(gender))
+        self.table.setItem(row_count, 3, QTableWidgetItem(position))
+        self.table.setItem(row_count, 4, QTableWidgetItem(team))
+        self.table.setItem(row_count, 5, QTableWidgetItem(team_performance))
+        self.table.setItem(row_count, 6, QTableWidgetItem(injury))
+        self.table.setItem(row_count, 7, QTableWidgetItem(goals))
+        self.table.setItem(row_count, 8, QTableWidgetItem(assists))
+        self.table.setItem(row_count, 9, QTableWidgetItem(rebounds))
+        # Clear input fields
+        self.name_edit.clear()
+        self.age_edit.clear()
+        self.gender_combo.setCurrentIndex(0)
+        self.position_edit.clear()
+        self.team_edit.clear()
+        self.team_performance_edit.clear()
+        self.injury_edit.clear()
+        self.goals_edit.clear()
+        self.assists_edit.clear()
+        self.rebounds_edit.clear()
+    def add_team(self):
+        team_name = self.team_name_edit.text()
+        coach_name = self.coach_name_edit.text()
+        stadium_name = self.stadium_name_edit.text()
+        founded_year = self.founded_year_edit.text()
+        player_roster = self.player_roster_edit.text().split(',')
+        team_performance = self.team_performance_edit_2.text()
+        points = self.points_edit.text()
+        goals_scored = self.goals_scored_edit.text()
+        goals_conceded = self.goals_conceded_edit.text()
+        # TODO: Add the team to the table
+        rowPosition = self.tableWidget.rowCount()
+        self.tableWidget.insertRow(rowPosition)
+        self.tableWidget.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(team_name))
+        self.tableWidget.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(coach_name))
+        self.tableWidget.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(stadium_name))
+        self.tableWidget.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(founded_year))
+        self.tableWidget.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(', '.join(player_roster)))
+        self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(team_performance))
+        self.tableWidget.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(points))
+        self.tableWidget.setItem(rowPosition , 7, QtWidgets.QTableWidgetItem(goals_scored))
+        self.tableWidget.setItem(rowPosition , 8, QtWidgets.QTableWidgetItem(goals_conceded))
+        self.team_name_edit.clear()
+        self.coach_name_edit.clear()
+        self.stadium_name_edit.clear()
+        self.founded_year_edit.clear()
+        self.player_roster_edit.clear()
+        self.team_performance_edit_2.clear()
+        self.points_edit.clear()
+        self.goals_scored_edit.clear()
+        self.goals_conceded_edit.clear()
+    def load_data(self):
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
+        if fileName:
+            with open(fileName, newline='', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                self.table.setRowCount(0)
+                for row_data in reader:
+                    row = self.table.rowCount()
+                    self.table.insertRow(row)
+                    for column, item in enumerate(row_data):
+                        self.table.setItem(row, column, QTableWidgetItem(item))
+    def save_data(self):
+        file_dialog = QFileDialog()
+        file_dialog.setDefaultSuffix('csv')
+        file_path, _ = file_dialog.getSaveFileName(self, 'Mentés', '', 'CSV files (*.csv);;All Files (*)')
+        if file_path:
+            with open(file_path, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                header_row = ['Név', 'Kor', 'Nem', 'Pozíció', 'Csapat', 'Csapat teljesítmény', 'Sérülési történet', 'Gólok', 'Gólpasszok', 'Lepattanók', 'Pontok', 'Stadion']
+                writer.writerow(header_row)
+                for row in range(self.table.rowCount()):
+                    data_row = []
+                    for column in range(self.table.columnCount()):
+                        data_row.append(self.table.item(row, column).text())
+                    writer.writerow(data_row)
+class Team:
+    def __init__(self, name, coach_name, stadium_name, founded_year, player_roster=None):
+        self.name = name
+        self.coach_name = coach_name
+        self.stadium_name = stadium_name
+        self.founded_year = founded_year
+        self.player_roster = player_roster or []
+        self.team_performance = None
+        self.points = 0
+        self.goals_scored = 0
+        self.goals_conceded = 0
+class TeamPerformance:
+    def __init__(self, wins, draws, losses, goals_scored, goals_conceded):
+        self.wins = wins
+        self.draws = draws
+        self.losses = losses
+        self.goals_scored = goals_scored
+        self.goals_conceded = goals_conceded
+class League:
+    def __init__(self, name, teams=None):
+        self.name = name
+        self.teams = teams or []
+        self.matches = []
+        self.match_results = []
+        self.teams = []
+
+class Match:
+    def __init__(self, home_team, away_team, home_goals=None, away_goals=None):
+        self.home_team = home_team
+        self.away_team = away_team
+        self.home_goals = home_goals
+        self.away_goals = away_goals
+class MatchResult:
+    def __init__(self, match, home_goals, away_goals):
+        self.match = match
+        self.home_goals = home_goals
+        self.away_goals = away_goals
+
+    def add_match_result(self, home_team_name, guest_team_name, home_team_goals, guest_team_goals):
+        home_team = self.find_team(home_team_name)
+        guest_team = self.find_team(guest_team_name)
+        for match in self.matches:
+            if match.home_team == home_team and match.guest_team == guest_team:
+                match.result = (home_team_goals, guest_team_goals)
+                break
+
+class LeagueWindow(QWidget):
+    def __init__(self, league):
+        super().__init__()
+        self.league = league
+        self.matches_table = QTableWidget()
+        self.matches_table.setColumnCount(3)
+        self.matches_table.setHorizontalHeaderLabels(['Hazai csapat', 'Vendég csapat', 'Eredmény'])
+        self.match_results_table = QTableWidget()
+        self.match_results_table.setColumnCount(3)
+        self.match_results_table.setHorizontalHeaderLabels(['Hazai csapat', 'Vendég csapat', 'Eredmény'])
+        self.team_table = QTableWidget()
+        self.team_table.setColumnCount(8)
+        self.team_table.setHorizontalHeaderLabels(['Név', 'Pontszám', 'Gólkülönbség', 'Gólok száma', 'Kapott gólok száma', 'Győzelmek száma', 'Döntetlenek száma', 'Vereségek száma'])
+        self.update_matches_table()
+        self.update_team_table()
+        matches_label = QLabel('Mérkőzések')
+        match_results_label = QLabel('Mérkőzés eredmények')
+        team_label = QLabel('Csapatok')
+        save_button = QPushButton('Mentés')
+        save_button.clicked.connect(self.save_le)
+
+
+
+    def save_le(self):
+        self.league.save()
+
+
+    def update_matches_table(self):
+        self.matches_table.setRowCount(len(self.league.matches))
+        for i, match in enumerate(self.league.matches):
+            home_team_name = match.home_team.name
+            away_team_name = match.away_team.name
+            score = f"{match.home_team_goals}-{match.away_team_goals}"
+            self.matches_table.setItem(i, 0, QTableWidgetItem(home_team_name))
+            self.matches_table.setItem(i, 1, QTableWidgetItem(away_team_name))
+            self.matches_table.setItem(i, 2, QTableWidgetItem(score))
+    def update_team_table(self):
+        self.team_table.setRowCount(len(self.league.teams))
+        for i, team in enumerate(self.league.teams):
+            name = team.name
+            points = team.points
+            goal_diff = team.goal_diff
+            goals_scored = team.goals_scored
+            goals_conceded = team.goals_conceded
+            wins = team.wins
+            draws = team.draws
+            losses = team.losses
+            self.team_table.setItem(i, 0, QTableWidgetItem(name))
+            self.team_table.setItem(i, 1, QTableWidgetItem(str(points)))
+            self.team_table.setItem(i, 2, QTableWidgetItem(str(goal_diff)))
+            self.team_table.setItem(i, 3, QTableWidgetItem(str(goals_scored)))
+            self.team_table.setItem(i, 4, QTableWidgetItem(str(goals_conceded)))
+            self.team_table.setItem(i, 5, QTableWidgetItem(str(wins)))
+            self.team_table.setItem(i, 6, QTableWidgetItem(str(draws)))
+            self.team_table.setItem(i, 7, QTableWidgetItem(str(losses)))
+    def save_league(self):
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Mentés', '', 'CSV Files (*.csv)')
+        if file_name:
+            with open(file_name, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Mérkőzések'])
+                writer.writerow(['Hazai csapat', 'Vendég csapat', 'Eredmény'])
+                for match in self.league.matches:
+                    writer.writerow([match.home_team.name, match.away_team.name, f"{match.home_team_goals}-{match.away_team_goals}"])
+
+                writer.writerow(['Csapatok'])
+                writer.writerow(['Név', 'Pontszám', 'Gólkülönbség', 'Gólok száma', 'Kapott gólok száma', 'Győzelmek száma', 'Döntetlenek száma', 'Vereségek száma'])
+                for team in self.league.teams:
+                    writer.writerow([team.name, team.points, team.goal_diff, team.goals_scored, team.goals_conceded, team.wins, team.draws, team.losses])
+        print('A liga adatai sikeresen mentve!') 
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    league = League("My League")
+    main_window = MainWindow()
+    main_window.show()
+    league_window = LeagueWindow(league)
+    league_window.show()
+    sys.exit(app.exec_())
+
